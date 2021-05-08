@@ -1,18 +1,19 @@
 import math
 from datetime import datetime
 from selenium.common.exceptions import NoAlertPresentException
+from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver import Remote
-from selenium.webdriver.support import expected_conditions as ExpCond
+from selenium.webdriver.support import expected_conditions as ExpCn
 from selenium.webdriver.support.wait import WebDriverWait
 from .locators import BasePageLocators
 from .locators import MainPageLocators
 
 class BasePage():
-    def __init__(self, browser, url):  #timeout=5
+    def __init__(self, browser, url, timeout=5):  
         self.browser = browser
         self.url = url
-        #self.browser.implicitly_wait(timeout)
+        self.browser.implicitly_wait(timeout)
     
     def open(self):
     	self.browser.get(self.url)
@@ -27,7 +28,7 @@ class BasePage():
     def is_not_element_present(self, how, what, timeout=4):
         try:
             WebDriverWait(self.browser, timeout).until(
-                ExpCond.presence_of_element_located((how, what)))
+                ExpCn.presence_of_element_located((how, what)))
         except TimeoutException:
             return True
         return False 
@@ -36,8 +37,7 @@ class BasePage():
         try:
             WebDriverWait(self.browser, timeout, 1,
                           TimeoutException).until_not(
-                              ExpCond.presence_of_element_located((how, what)))
-                              #some like EC.presence_of_element_located((By.CSS_SELECTOR, ".alertinner strong"))
+                              ExpCn.presence_of_element_located((how, what)))
         except TimeoutException:
             return False
         return True
@@ -52,6 +52,9 @@ class BasePage():
     def go_to_basket_page(self):
         basket_link = self.browser.find_element(*MainPageLocators.BASKET_BUTTON)
         basket_link.click()
+    
+    def should_be_authorized_user(self):
+        assert self.is_element_present(*BasePageLocators.USER_ICON), "User icon is not presented probably unauthorised user"
 
     def solve_quiz_and_get_code(self):
         alert = self.browser.switch_to.alert

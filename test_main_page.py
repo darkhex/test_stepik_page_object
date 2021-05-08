@@ -5,7 +5,6 @@ from .pages.basket_page import BasketPage
 
 link = "http://selenium1py.pythonanywhere.com"
 
-@pytest.mark.login_guest
 class TestLoginFromMainPage():    
 
     def test_guest_should_see_login_link(self,browser):
